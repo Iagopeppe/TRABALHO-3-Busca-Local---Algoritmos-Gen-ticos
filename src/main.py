@@ -21,7 +21,7 @@ def gerar_posicoes(nome_arquivo):
 
 # Gera uma matriz com as distancias entre cada item/elemento do array
 # Obs.: utiliza das variaveis globais [x,y] para pegar as coordenadas
-def gerar_distancias(populacao):
+def gerar_distancias(populacao, x, y):
     tamanho_matriz = len(populacao)
     matriz_distancia = np.zeros((tamanho_matriz, tamanho_matriz)) #instancia a matriz de distancias
 
@@ -35,10 +35,12 @@ def gerar_distancias(populacao):
 
 # Funcao de custo para o problema do caixeiro viajante
 # Deve-se passar como argumento um individuo/cromossomo de uma populacao
-def func_custo(cromossomo):
-    custo = 0
-    for gene in cromossomo:
-        custo += x
+def func_custo(cromossomo, matriz_distancia):
+    custo = 0.00
+
+    for idx, gene in enumerate(cromossomo):
+        if (idx < (len(cromossomo) - 1)):
+            custo += matriz_distancia[gene][cromossomo[idx+1]]
     return custo
 
 # Contem todos os processos do algoritmo
@@ -50,7 +52,7 @@ def main():
     x = posicoes[0]
     y = posicoes[1]
 
-    distancias = gerar_distancias(populacao)
+    distancias = gerar_distancias(populacao, x, y)
 
 
 

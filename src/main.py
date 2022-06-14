@@ -47,6 +47,36 @@ def func_custo(cromossomo, matriz_distancia):
     return custo
 
 
+#
+#
+def escolhe_pais(grupo):
+    roleta = gerar_roleta(grupo)
+
+    casais = [[], [], [], [], []]
+
+    for idx, item in enumerate(casais):
+        pai1 = np.random.choice(roleta)
+        pai2 = np.random.choice(roleta)
+        while pai2 == pai1:
+            pai2 = np.random.choice(roleta)
+
+        casais[idx] = [pai1, pai2]
+
+    return casais
+
+
+def gerar_roleta(lista):
+    roleta = []
+    i = 10
+    for item in lista:
+        j = i
+        while j > 0:
+            roleta.append(item)
+            j -= 1
+        i -= 1
+    return roleta
+
+
 # Contem todos os processos do algoritmo
 def main():
     # 1. Codificar a população de indivíduos (20 individuos)
@@ -59,7 +89,8 @@ def main():
 
     # 2. Aplicado a funcao de custo/aptidao para cada individuo/cromossomo e organiza-os de menor ao maior
     # Obs.: quanto menor o custo, melhor
-    custos_populacao = np.empty(len(populacao), dtype=float)  # cria lista onde serao armazenados os custos de cada cromossomo/individuo
+    custos_populacao = np.empty(len(populacao),
+                                dtype=float)  # cria lista onde serao armazenados os custos de cada cromossomo/individuo
 
     for idx, cromossomo in enumerate(populacao):
         custos_populacao[idx] = func_custo(cromossomo, distancias)  # realiza o calculo de custo para cada cromossomo
@@ -67,8 +98,15 @@ def main():
     custos_cromossomos = list(zip(custos_populacao, populacao))  # parelha a lista de custos com a lista de cromossomos
     custos_cromossomos.sort()  # organiza a lista de menor para maior
 
+    # 3. Metodo de selecao dos pais
+    populacao = []  # selecionar os 10 melhores individuos/cromossomos
 
+    i = 0
+    while i < 10:
+        populacao.append(custos_cromossomos[i][0])
+        i += 1
 
+    casais = escolhe_pais(populacao)
 
 
 main()

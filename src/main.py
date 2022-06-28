@@ -6,7 +6,7 @@ import h5py
 from itertools import permutations
 from scipy.spatial import distance
 
-global x, y, total_mutacoes, melhor_custo, melhor_solucao
+x, y, total_mutacoes, melhor_custo, melhor_solucao = 0, 0, 0, 0, 0
 
 
 # Carrega o arquivo especificado e transforma em um array de int
@@ -57,14 +57,39 @@ def escolhe_pais(grupo):
     casais = [[], [], [], [], []]
 
     for idx, item in enumerate(casais):
-        pai1 = roleta[random.randint(0, 54)]
-        pai2 = roleta[random.randint(0, 54)]
-        while np.array_equal(pai2, pai1):
-            pai2 = roleta[random.randint(0, 54)]
+        idx_pai1 = random.randint(0, 54)
+        pai1 = roleta[idx_pai1]
+        idx_pai2 = random.randint(0, 54)
+        pai2 = roleta[idx_pai2]
+        while np.array_equal(valida_range(idx_pai2), valida_range(idx_pai1)):
+            idx_pai2 = random.randint(0, 54)
+            pai2 = roleta[idx_pai2]
 
         casais[idx] = [pai1, pai2]
 
     return casais
+
+def valida_range(numero):
+    if -1 < numero > 10:
+        return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    elif 9 < numero > 19:
+        return [10, 11, 12, 13, 14, 15, 16, 17, 18]
+    elif 18 < numero > 27:
+        return [19, 20, 21, 22, 23, 24, 25, 26]
+    elif 26 < numero > 34:
+        return [27, 28, 29, 30, 31, 32, 33]
+    elif 33 < numero > 40:
+        return [34, 35, 36, 37, 38, 39]
+    elif 39 < numero > 45:
+        return [40, 41, 42, 43, 44]
+    elif 44 < numero > 49:
+        return [45, 46, 47, 48]
+    elif 48 < numero > 52:
+        return [49, 50, 51]
+    elif 51 < numero > 54:
+        return [52, 53]
+    elif numero == 54:
+        return [54]
 
 # Para determinar a distribuição do conjunto de cromossomos que serão escolhidos para a
 # reprodução, calculamos a probabilidade, na qual distribuímos os valores inversamente
@@ -87,8 +112,8 @@ def recombinar(casais):
     i = 0
     while i < 5:
         trocar_ultima_posicao = False
-        descendente1 = casais[i][0]
-        descendente2 = casais[i][1]
+        descendente1 = casais[i][0].copy()
+        descendente2 = casais[i][1].copy()
         print("Pai 1: " + str(descendente1))
         print("Pai 2: " + str(descendente2))
 
@@ -185,7 +210,7 @@ def possui_valor_repetido(descendente):
 def mutacao(populacao_nova):
     global total_mutacoes
     for i in populacao_nova:
-        mutacao_aleatoria = random.randint(1, 10000)
+        mutacao_aleatoria = random.randint(1, 100)
         if 1 <= mutacao_aleatoria <= 5:
             print("ocorreu mutação")
             indices = gerar_indices()
@@ -219,7 +244,7 @@ def print_resultados():
         media_mutacao = media_mutacao * 100
 
     print("Tamanho da população: 20")
-    print("Probabilidade de ocorrer mutação: 0,05%")
+    print("Probabilidade de ocorrer mutação: 0,05")
     print("Mutações ocorridas: " + str(total_mutacoes))
     print("Média de mutações: " + str(media_mutacao) + "%")
     print("Número de cidades: 20")
@@ -240,7 +265,7 @@ def main():
     ciclos = 0
     global melhor_custo, melhor_solucao
     melhor_custo = sys.float_info.max
-    while ciclos < 10:
+    while ciclos < 10000:
         # 2. Aplicado a funcao de custo/aptidao para cada individuo/cromossomo e organiza-os de menor ao maior
         # Obs.: quanto menor o custo, melhor
         custos_populacao = np.empty(len(populacao),
@@ -252,7 +277,7 @@ def main():
 
         custos_cromossomos = list(
             zip(custos_populacao, populacao))  # parelha a lista de custos com a lista de cromossomos
-        custos_cromossomos.sort()  # organiza a lista de menor para maior
+        custos_cromossomos.sort(key=lambda x: x[0])  # organiza a lista de menor para maior
         if melhor_custo > custos_cromossomos[0][0]:
             melhor_custo = custos_cromossomos[0][0]
             melhor_solucao = custos_cromossomos[0][1]
